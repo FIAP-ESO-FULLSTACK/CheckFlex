@@ -32,7 +32,8 @@ As branches legadas `feature` e `fix` podem existir no repositório, mas para no
 - O PR deve ter destino em `desenvolvimento`.
 - A branch de origem deve seguir o padrão `feature/*` ou `fix/*`.
 - A branch de origem deve estar sincronizada com `desenvolvimento`.
-- O repositório deve manter os arquivos mínimos obrigatórios, como `README.md`.
+- O repositório deve manter os arquivos obrigatórios do fluxo, como `README.md`, `CONTRIBUTING.md`, template de PR e workflows.
+- O README e a documentação de contribuição devem manter as seções mínimas esperadas pelo projeto.
 
 ## Configuração esperada no GitHub
 
