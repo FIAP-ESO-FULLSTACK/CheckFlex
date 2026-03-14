@@ -6,11 +6,13 @@ import {
   ReservationLookup,
 } from "@/domain/repositories/check-in-repository";
 
+// Simula latência de rede para aproximar a experiência local do fluxo real.
 const delay = (ms: number) =>
   new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
 
+// Base de dados em memória usada na demonstração e nos fluxos locais sem API real.
 const baseReservations: Reservation[] = [
   {
     id: "res-504",
@@ -38,21 +40,29 @@ const baseReservations: Reservation[] = [
   },
 ];
 
+// Lista de códigos exposta à UI para orientar a demonstração do fluxo.
 export const mockReservationCodeExamples = baseReservations.map(
   (reservation) => reservation.code,
 );
 
+// Gera um PIN previsível por quarto apenas para fins de demonstração.
 const buildPin = (roomNumber: string) => {
   const base = Number(roomNumber);
   return String(320000 + base).padStart(6, "0");
 };
 
+/**
+ * Implementação fake do repositório de check-in.
+ * Mantém estado local em memória para permitir desenvolvimento, testes visuais
+ * e validação da jornada sem depender de backend, PMS ou fechadura real.
+ */
 export class MockCheckInRepository implements CheckInRepository {
   // Mantém estado em memória para simular a evolução da reserva dentro do fluxo.
   private readonly reservations = new Map(
     baseReservations.map((reservation) => [reservation.id, { ...reservation }]),
   );
 
+  // Busca a reserva pelo código digitado no totem.
   async findReservation(input: ReservationLookup) {
     await delay(650);
 
@@ -66,6 +76,7 @@ export class MockCheckInRepository implements CheckInRepository {
     return reservation ? { ...reservation } : null;
   }
 
+  // Atualiza o status da reserva para refletir a conclusão do check-in.
   async confirmCheckIn(reservationId: string) {
     await delay(500);
 
@@ -89,6 +100,7 @@ export class MockCheckInRepository implements CheckInRepository {
     return { ...updatedReservation };
   }
 
+  // Emite uma credencial temporária com PIN e destino da chave digital.
   async issueGuestAccess(input: AccessRequest) {
     await delay(700);
 
