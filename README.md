@@ -60,6 +60,17 @@ Entrega do fluxo principal de self check-in com geração de senha temporária, 
 
 Implantação controlada em operação real, com acompanhamento próximo, coleta de feedback, ajustes de UX e refinamento das regras do processo.
 
+## Fluxo de trabalho em time
+
+- `main` é a branch de referência estável do projeto.
+- `desenvolvimento` é a branch de integração do time.
+- Todo trabalho de desenvolvimento deve nascer a partir de `desenvolvimento`.
+- As branches de trabalho devem seguir o padrão `feature/*` ou `fix/*`.
+- Desenvolvedores devem abrir PR apenas para `desenvolvimento`.
+- Após a validação do CI em `desenvolvimento`, o repositório fica preparado para promover essa branch automaticamente para `main`.
+
+As regras operacionais do fluxo de branches e PRs estão documentadas em [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## Fora de escopo neste momento
 
 - Pagamento no totem.
