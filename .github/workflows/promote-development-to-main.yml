@@ -18,12 +18,8 @@ jobs:
       - name: Checkout do repositório
         uses: actions/checkout@v4
 
-      - name: Verificar arquivos mínimos do repositório
-        run: |
-          test -s README.md || {
-            echo "::error::README.md é obrigatório e não pode estar vazio."
-            exit 1
-          }
+      - name: Validar estrutura do repositório
+        run: bash scripts/ci/validate_repository.sh
 
   promote-main:
     name: Promover desenvolvimento para main
