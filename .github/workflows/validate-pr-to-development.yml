@@ -1,0 +1,60 @@
+name: Validar PR para desenvolvimento
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+      - ready_for_review
+
+jobs:
+  validate-pr:
+    name: Validar destino e origem do PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout da branch do PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Validar branch de destino e padrão da branch de origem
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          echo "Base branch: $BASE_REF"
+          echo "Head branch: $HEAD_REF"
+
+          if [ "$BASE_REF" != "desenvolvimento" ]; then
+            echo "::error::PRs de desenvolvimento devem ter como destino a branch 'desenvolvimento'."
+            exit 1
+          fi
+
+          case "$HEAD_REF" in
+            feature|fix|feature/*|fix/*)
+              ;;
+            *)
+              echo "::error::A branch de origem deve seguir o padrão 'feature/*' ou 'fix/*'."
+              exit 1
+              ;;
+          esac
+
+      - name: Validar sincronização da branch com desenvolvimento
+        run: |
+          git fetch origin desenvolvimento
+
+          if ! git merge-base --is-ancestor origin/desenvolvimento HEAD; then
+            echo "::error::A branch do PR deve estar sincronizada com 'desenvolvimento' antes da abertura do PR."
+            exit 1
+          fi
+
+      - name: Verificar arquivos mínimos do repositório
+        run: |
+          test -s README.md || {
+            echo "::error::README.md é obrigatório e não pode estar vazio."
+            exit 1
+          }

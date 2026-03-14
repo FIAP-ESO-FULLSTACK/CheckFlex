@@ -1,0 +1,64 @@
+name: Promover desenvolvimento para main
+
+on:
+  push:
+    branches:
+      - desenvolvimento
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate-development:
+    name: Validar branch desenvolvimento
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Verificar arquivos mínimos do repositório
+        run: |
+          test -s README.md || {
+            echo "::error::README.md é obrigatório e não pode estar vazio."
+            exit 1
+          }
+
+  promote-main:
+    name: Promover desenvolvimento para main
+    runs-on: ubuntu-latest
+    needs: validate-development
+
+    steps:
+      - name: Checkout com histórico completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sincronizar referências remotas
+        run: git fetch origin main desenvolvimento
+
+      - name: Validar elegibilidade da promoção
+        run: |
+          if ! git merge-base --is-ancestor origin/main origin/desenvolvimento; then
+            echo "::error::A branch 'main' contém commits que ainda não estão em 'desenvolvimento'."
+            echo "::error::Sincronize 'desenvolvimento' com 'main' antes da promoção automática."
+            exit 1
+          fi
+
+          if [ "$(git rev-parse origin/main)" = "$(git rev-parse origin/desenvolvimento)" ]; then
+            echo "main já está sincronizada com desenvolvimento."
+            exit 0
+          fi
+
+      - name: Configurar identidade do GitHub Actions
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Atualizar main por fast-forward
+        run: |
+          git checkout -B main origin/main
+          git merge --ff-only origin/desenvolvimento
+          git push origin HEAD:main
