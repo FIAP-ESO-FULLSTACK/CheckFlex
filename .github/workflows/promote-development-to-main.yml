@@ -21,6 +21,17 @@ jobs:
       - name: Validar estrutura do repositório
         run: bash scripts/ci/validate_repository.sh
 
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências do frontend
+        run: npm install
+
+      - name: Validar frontend
+        run: bash scripts/ci/run_frontend_checks.sh
+
   promote-main:
     name: Promover desenvolvimento para main
     runs-on: ubuntu-latest
