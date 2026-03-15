@@ -5,9 +5,18 @@ set -euo pipefail
 required_files=(
   "README.md"
   "CONTRIBUTING.md"
+  "package.json"
+  "tsconfig.json"
+  "tsconfig.typecheck.json"
+  "eslint.config.mjs"
+  "vitest.config.ts"
+  "vitest.setup.ts"
+  "app/layout.tsx"
+  "app/page.tsx"
   ".github/pull_request_template.md"
   ".github/workflows/validate-pr-to-development.yml"
   ".github/workflows/promote-development-to-main.yml"
+  "scripts/ci/run_frontend_checks.sh"
 )
 
 readme_sections=(
@@ -74,5 +83,14 @@ echo "Validando seções obrigatórias do guia de contribuição..."
 for section in "${contributing_sections[@]}"; do
   assert_text_present "CONTRIBUTING.md" "$section"
 done
+
+echo "Validando base mínima do frontend..."
+
+assert_text_present "package.json" "\"build\": \"next build\""
+assert_text_present "package.json" "\"lint\": \"eslint . --max-warnings=0\""
+assert_text_present "package.json" "\"test\": \"vitest run\""
+assert_text_present "package.json" "\"typecheck\": \"tsc --noEmit -p tsconfig.typecheck.json\""
+assert_text_present "app/page.tsx" "CheckInExperience"
+assert_text_present "app/layout.tsx" "CheckFlex | Self check-in kiosk"
 
 echo "Validação estrutural do repositório concluída com sucesso."
