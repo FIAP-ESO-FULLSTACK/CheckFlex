@@ -86,7 +86,8 @@ Implantação controlada em operação real, com acompanhamento próximo, coleta
 - Todo trabalho de desenvolvimento deve nascer a partir de `desenvolvimento`.
 - As branches de trabalho devem seguir o padrão `feature/*` ou `fix/*`.
 - Desenvolvedores devem abrir PR apenas para `desenvolvimento`.
-- Após a validação do CI em `desenvolvimento`, o repositório fica preparado para promover essa branch automaticamente para `main`.
+- Após a validação do CI em `desenvolvimento`, o repositório cria ou atualiza automaticamente um PR de promoção para `main`.
+- Quando esse PR automático atende às proteções da branch estável, o GitHub conclui o merge por auto-merge.
 
 As regras operacionais do fluxo de branches e PRs estão documentadas em [CONTRIBUTING.md](./CONTRIBUTING.md).
 

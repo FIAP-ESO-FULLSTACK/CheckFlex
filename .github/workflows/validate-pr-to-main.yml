@@ -1,0 +1,58 @@
+name: Validar PR de desenvolvimento para main
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - edited
+      - ready_for_review
+
+permissions:
+  contents: read
+
+jobs:
+  validate-promotion-pr:
+    name: Validar PR de promocao para main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validar origem e destino do PR
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          echo "Base branch: $BASE_REF"
+          echo "Head branch: $HEAD_REF"
+
+          if [ "$BASE_REF" != "main" ]; then
+            echo "::error::Este workflow deve validar apenas PRs com destino para 'main'."
+            exit 1
+          fi
+
+          if [ "$HEAD_REF" != "desenvolvimento" ]; then
+            echo "::error::A promocao automatica da branch estavel deve partir de 'desenvolvimento'."
+            exit 1
+          fi
+
+      - name: Checkout da branch do PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Validar estrutura do repositório
+        run: bash scripts/ci/validate_repository.sh
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências do frontend
+        run: npm install
+
+      - name: Validar frontend
+        run: bash scripts/ci/run_frontend_checks.sh
