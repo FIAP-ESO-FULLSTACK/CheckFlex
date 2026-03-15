@@ -15,6 +15,7 @@ required_files=(
   "app/page.tsx"
   ".github/pull_request_template.md"
   ".github/workflows/validate-pr-to-development.yml"
+  ".github/workflows/validate-pr-to-main.yml"
   ".github/workflows/promote-development-to-main.yml"
   "scripts/ci/run_frontend_checks.sh"
 )
