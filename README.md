@@ -20,9 +20,28 @@ Na direção atual do projeto, o hóspede realiza o self check-in no totem, rece
 - Credencial complementar: chave virtual via app da G-Locks.
 - Cartão de proximidade e chave mecânica como contingência operacional.
 
+## Frontend atual
+
+- Implementado com React, Next.js e Radix UI.
+- Estruturado em camadas de domínio, aplicação, infraestrutura e apresentação.
+- Preparado para operar com mocks agora e trocar para API real com baixo acoplamento.
+
+## Como executar localmente
+
+1. Instale as dependências com `npm install`.
+2. Inicie o ambiente de desenvolvimento com `npm run dev`.
+3. Acesse `http://localhost:3000`.
+
+Para validar a aplicação localmente:
+
+- `npm run test`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
+
 ## Como o fluxo funciona
 
-1. O hóspede localiza a reserva no totem.
+1. O hóspede localiza a reserva pelo código no totem.
 2. O sistema conduz a confirmação do check-in.
 3. O hóspede informa telefone ou e-mail.
 4. O sistema gera um PIN temporário para a estadia.
