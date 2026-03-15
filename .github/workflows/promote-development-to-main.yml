@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
+  pull-requests: write
 
 jobs:
   validate-development:
@@ -21,40 +22,134 @@ jobs:
       - name: Validar estrutura do repositório
         run: bash scripts/ci/validate_repository.sh
 
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instalar dependências do frontend
+        run: npm install
+
+      - name: Validar frontend
+        run: bash scripts/ci/run_frontend_checks.sh
+
   promote-main:
-    name: Promover desenvolvimento para main
+    name: Abrir ou atualizar PR de desenvolvimento para main
     runs-on: ubuntu-latest
     needs: validate-development
 
     steps:
-      - name: Checkout com histórico completo
-        uses: actions/checkout@v4
+      - name: Verificar diferença entre desenvolvimento e main
+        id: compare
+        uses: actions/github-script@v7
         with:
-          fetch-depth: 0
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const { data } = await github.rest.repos.compareCommitsWithBasehead({
+              owner,
+              repo,
+              basehead: "main...desenvolvimento",
+            });
 
-      - name: Sincronizar referências remotas
-        run: git fetch origin main desenvolvimento
+            core.info(`Status da comparação: ${data.status}`);
 
-      - name: Validar elegibilidade da promoção
-        run: |
-          if ! git merge-base --is-ancestor origin/main origin/desenvolvimento; then
-            echo "::error::A branch 'main' contém commits que ainda não estão em 'desenvolvimento'."
-            echo "::error::Sincronize 'desenvolvimento' com 'main' antes da promoção automática."
-            exit 1
-          fi
+            if (data.status === "identical") {
+              core.setOutput("promote_needed", "false");
+              return;
+            }
 
-          if [ "$(git rev-parse origin/main)" = "$(git rev-parse origin/desenvolvimento)" ]; then
-            echo "main já está sincronizada com desenvolvimento."
-            exit 0
-          fi
+            if (data.status !== "ahead") {
+              core.setFailed(
+                "A branch 'main' contém commits que ainda não estão em 'desenvolvimento'. Sincronize 'desenvolvimento' com 'main' antes da promoção automática.",
+              );
+              return;
+            }
 
-      - name: Configurar identidade do GitHub Actions
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            core.setOutput("promote_needed", "true");
 
-      - name: Atualizar main por fast-forward
-        run: |
-          git checkout -B main origin/main
-          git merge --ff-only origin/desenvolvimento
-          git push origin HEAD:main
+      - name: Criar ou reutilizar PR de promoção
+        if: steps.compare.outputs.promote_needed == 'true'
+        id: promotion-pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const base = "main";
+            const head = "desenvolvimento";
+            const headRef = `${owner}:${head}`;
+
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: "open",
+              base,
+              head: headRef,
+            });
+
+            let pullRequest = pullRequests[0];
+
+            if (!pullRequest) {
+              const response = await github.rest.pulls.create({
+                owner,
+                repo,
+                base,
+                head,
+                title: "Promover desenvolvimento para main",
+                body: [
+                  "## Promoção automática",
+                  "",
+                  "Este PR foi criado automaticamente após a validação da branch `desenvolvimento`.",
+                  "",
+                  "- Origem: `desenvolvimento`",
+                  "- Destino: `main`",
+                  "- Objetivo: promover a versão validada para a branch estável",
+                ].join("\n"),
+              });
+
+              pullRequest = response.data;
+              core.info(`PR criado: #${pullRequest.number}`);
+            } else {
+              core.info(`PR reutilizado: #${pullRequest.number}`);
+            }
+
+            core.setOutput("pr_number", String(pullRequest.number));
+            core.setOutput("pr_node_id", pullRequest.node_id);
+
+      - name: Habilitar auto-merge do PR de promoção
+        if: steps.compare.outputs.promote_needed == 'true'
+        uses: actions/github-script@v7
+        env:
+          PR_NODE_ID: ${{ steps.promotion-pr.outputs.pr_node_id }}
+          PR_NUMBER: ${{ steps.promotion-pr.outputs.pr_number }}
+        with:
+          script: |
+            try {
+              await github.graphql(
+                `
+                  mutation EnableAutoMerge($pullRequestId: ID!) {
+                    enablePullRequestAutoMerge(
+                      input: {
+                        pullRequestId: $pullRequestId
+                        mergeMethod: SQUASH
+                      }
+                    ) {
+                      pullRequest {
+                        number
+                      }
+                    }
+                  }
+                `,
+                {
+                  pullRequestId: process.env.PR_NODE_ID,
+                },
+              );
+
+              core.info(`Auto-merge habilitado para o PR #${process.env.PR_NUMBER}.`);
+            } catch (error) {
+              core.warning(
+                `Nao foi possivel habilitar o auto-merge para o PR #${process.env.PR_NUMBER}. Verifique se a opcao 'Allow auto-merge' esta ativa no repositorio e se o GitHub Actions pode atuar nessa regra.`,
+              );
+              core.warning(String(error));
+            }

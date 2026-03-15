@@ -20,9 +20,28 @@ Na direção atual do projeto, o hóspede realiza o self check-in no totem, rece
 - Credencial complementar: chave virtual via app da G-Locks.
 - Cartão de proximidade e chave mecânica como contingência operacional.
 
+## Frontend atual
+
+- Implementado com React, Next.js e Radix UI.
+- Estruturado em camadas de domínio, aplicação, infraestrutura e apresentação.
+- Preparado para operar com mocks agora e trocar para API real com baixo acoplamento.
+
+## Como executar localmente
+
+1. Instale as dependências com `npm install`.
+2. Inicie o ambiente de desenvolvimento com `npm run dev`.
+3. Acesse `http://localhost:3000`.
+
+Para validar a aplicação localmente:
+
+- `npm run test`
+- `npm run lint`
+- `npm run typecheck`
+- `npm run build`
+
 ## Como o fluxo funciona
 
-1. O hóspede localiza a reserva no totem.
+1. O hóspede localiza a reserva pelo código no totem.
 2. O sistema conduz a confirmação do check-in.
 3. O hóspede informa telefone ou e-mail.
 4. O sistema gera um PIN temporário para a estadia.
@@ -67,7 +86,8 @@ Implantação controlada em operação real, com acompanhamento próximo, coleta
 - Todo trabalho de desenvolvimento deve nascer a partir de `desenvolvimento`.
 - As branches de trabalho devem seguir o padrão `feature/*` ou `fix/*`.
 - Desenvolvedores devem abrir PR apenas para `desenvolvimento`.
-- Após a validação do CI em `desenvolvimento`, o repositório fica preparado para promover essa branch automaticamente para `main`.
+- Após a validação do CI em `desenvolvimento`, o repositório cria ou atualiza automaticamente um PR de promoção para `main`.
+- Quando esse PR automático atende às proteções da branch estável, o GitHub conclui o merge por auto-merge.
 
 As regras operacionais do fluxo de branches e PRs estão documentadas em [CONTRIBUTING.md](./CONTRIBUTING.md).
 
