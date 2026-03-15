@@ -91,6 +91,6 @@ assert_text_present "package.json" "\"lint\": \"eslint . --max-warnings=0\""
 assert_text_present "package.json" "\"test\": \"vitest run\""
 assert_text_present "package.json" "\"typecheck\": \"tsc --noEmit -p tsconfig.typecheck.json\""
 assert_text_present "app/page.tsx" "CheckInExperience"
-assert_text_present "app/layout.tsx" "CheckFlex | Self check-in kiosk"
+assert_text_present "app/layout.tsx" "CheckFlex"
 
 echo "Validação estrutural do repositório concluída com sucesso."

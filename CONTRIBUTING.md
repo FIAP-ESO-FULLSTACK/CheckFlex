@@ -43,5 +43,3 @@ Para que o fluxo funcione de ponta a ponta, o repositório deve manter as seguin
 - Proteger `main` para bloquear pushes diretos.
 - Exigir os checks do GitHub Actions antes do merge.
 - Permitir que o GitHub Actions atualize a `main` após a validação da `desenvolvimento`.
-
-Sem essas proteções, os workflows continuam ajudando na validação, mas a regra de governança não fica totalmente garantida apenas pelo conteúdo versionado do repositório.
