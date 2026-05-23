@@ -28,7 +28,7 @@ describe("FindReservationUseCase", () => {
     const useCase = new FindReservationUseCase(repository);
 
     await expect(useCase.execute({ code: "INVALIDA" })).rejects.toThrow(
-      "Não encontramos uma reserva com esse código. Revise os dados e tente novamente.",
+      "Reserva não encontrada ou dados não conferem. Revise os dados e tente novamente.",
     );
   });
 });

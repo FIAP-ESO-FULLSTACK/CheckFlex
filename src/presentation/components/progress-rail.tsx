@@ -2,6 +2,7 @@
 
 import * as Progress from "@radix-ui/react-progress";
 import clsx from "clsx";
+import { useTranslation } from "@/i18n/locale-context";
 
 /**
  * Props da barra de progresso da jornada do hóspede.
@@ -15,12 +16,13 @@ interface ProgressRailProps {
  * Representa visualmente o avanço do hóspede nas etapas do autoatendimento.
  */
 export const ProgressRail = ({ currentStep, steps }: ProgressRailProps) => {
+  const { t } = useTranslation();
   const progressValue = ((currentStep + 1) / steps.length) * 100;
 
   return (
     <div className="progress-rail">
       <div className="progress-rail__header">
-        <span className="eyebrow">Jornada do hóspede</span>
+        <span className="eyebrow">{t("progress.journey")}</span>
         <strong>{steps[currentStep]}</strong>
       </div>
 

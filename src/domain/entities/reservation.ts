@@ -1,7 +1,7 @@
 /**
  * Estados relevantes da reserva dentro do fluxo atual de autoatendimento.
  */
-export type ReservationStatus = "reserved" | "checked-in";
+export type ReservationStatus = "reserved" | "checked-in" | "checked-out";
 
 /**
  * Representa a hospedagem localizada pelo hóspede antes da emissão do acesso.
