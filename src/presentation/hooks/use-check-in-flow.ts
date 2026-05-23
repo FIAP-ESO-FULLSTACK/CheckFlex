@@ -8,6 +8,7 @@ import {
   AccessRequest,
   ReservationLookup,
 } from "@/domain/repositories/check-in-repository";
+import type { IdentityFactor } from "@/presentation/components/reservation-lookup-form";
 
 // Etapas visíveis da jornada do hóspede na interface do totem.
 type Stage = "lookup" | "review" | "ready";
@@ -15,12 +16,18 @@ type Stage = "lookup" | "review" | "ready";
 // Estado local do formulário que acompanha a busca e a emissão do acesso.
 interface LookupFormState {
   reservationCode: string;
+  document: string;
+  birthDate: string;
+  identityFactor: IdentityFactor;
   phone: string;
   email: string;
 }
 
 const initialLookupForm: LookupFormState = {
   reservationCode: "",
+  document: "",
+  birthDate: "",
+  identityFactor: "document",
   phone: "",
   email: "",
 };
@@ -38,15 +45,29 @@ interface CheckInFlowServices {
 
 type CheckInFlowServicesFactory = () => CheckInFlowServices;
 
+// Constrói o payload de lookup levando em conta o segundo fator escolhido.
+const buildLookupPayload = (form: LookupFormState): ReservationLookup => {
+  const base: ReservationLookup = {
+    code: form.reservationCode.trim(),
+  };
+
+  if (form.identityFactor === "document" && form.document.trim()) {
+    base.document = form.document.trim();
+  }
+
+  if (form.identityFactor === "birthDate" && form.birthDate.trim()) {
+    base.birthDate = form.birthDate.trim();
+  }
+
+  return base;
+};
+
 /**
  * Orquestra a jornada de self check-in no frontend.
- * Centraliza estado, transições de etapa e chamadas aos casos de uso para
- * que os componentes de apresentação permaneçam declarativos e desacoplados.
  */
 export const useCheckInFlow = (
   createServices: CheckInFlowServicesFactory = createCheckInExperience,
 ) => {
-  // A composição fica isolada aqui para a UI depender só de casos de uso.
   const [services] = useState(() => createServices());
   const [stage, setStage] = useState<Stage>("lookup");
   const [lookupForm, setLookupForm] = useState<LookupFormState>(initialLookupForm);
@@ -57,22 +78,31 @@ export const useCheckInFlow = (
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [isIssuingAccess, setIsIssuingAccess] = useState(false);
 
-  const setLookupField = (field: keyof LookupFormState, value: string) => {
+  const setLookupField = (
+    field: Exclude<keyof LookupFormState, "identityFactor">,
+    value: string,
+  ) => {
     setLookupForm((current) => ({
       ...current,
       [field]: value,
     }));
   };
 
-  // Localiza a reserva e avança a UI para a etapa de revisão.
+  const setIdentityFactor = (factor: IdentityFactor) => {
+    setLookupForm((current) => ({
+      ...current,
+      identityFactor: factor,
+    }));
+  };
+
   const lookupReservation = async () => {
     setError(null);
     setIsLookingUp(true);
 
     try {
-      const nextReservation = await services.findReservation.execute({
-        code: lookupForm.reservationCode,
-      });
+      const nextReservation = await services.findReservation.execute(
+        buildLookupPayload(lookupForm),
+      );
 
       setReservation(nextReservation);
       setAccess(null);
@@ -84,21 +114,21 @@ export const useCheckInFlow = (
       setError(
         lookupError instanceof Error
           ? lookupError.message
-          : "Falha ao buscar a reserva.",
+          : "errors.lookupFailed",
       );
     } finally {
       setIsLookingUp(false);
     }
   };
 
-  // Confirma o check-in e emite a credencial temporária do hóspede.
   const issueGuestAccess = async () => {
     if (!reservation) {
       return;
     }
 
     if (!acceptedTerms) {
-      setError("Confirme os termos operacionais antes de concluir o check-in.");
+      // Emitimos a chave de tradução; o componente resolve para a string final.
+      setError("errors.termsNotAccepted");
       return;
     }
 
@@ -122,14 +152,13 @@ export const useCheckInFlow = (
       setError(
         issueError instanceof Error
           ? issueError.message
-          : "Falha ao emitir as credenciais do hóspede.",
+          : "errors.issueFailed",
       );
     } finally {
       setIsIssuingAccess(false);
     }
   };
 
-  // Reinicia o atendimento para um novo hóspede.
   const restartJourney = () => {
     setStage("lookup");
     setLookupForm(initialLookupForm);
@@ -141,7 +170,6 @@ export const useCheckInFlow = (
     setIsIssuingAccess(false);
   };
 
-  // Permite voltar à busca mantendo o formulário de contato disponível para ajuste.
   const goBackToLookup = () => {
     setStage("lookup");
     setAccess(null);
@@ -158,6 +186,7 @@ export const useCheckInFlow = (
     isLookingUp,
     isIssuingAccess,
     setLookupField,
+    setIdentityFactor,
     setAcceptedTerms,
     lookupReservation,
     issueGuestAccess,

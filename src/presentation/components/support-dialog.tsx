@@ -2,6 +2,7 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { useTranslation } from "@/i18n/locale-context";
 import { Button } from "@/presentation/components/ui/button";
 
 /**
@@ -17,12 +18,14 @@ interface SupportDialogProps {
 export const SupportDialog = ({
   reservationCodeExamples,
 }: SupportDialogProps) => {
+  const { t } = useTranslation();
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
         <Button type="button" variant="ghost">
           <ExclamationTriangleIcon />
-          Precisa de ajuda?
+          {t("support.trigger")}
         </Button>
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -30,14 +33,15 @@ export const SupportDialog = ({
         <Dialog.Content className="dialog-content">
           <div className="dialog-content__header">
             <div>
-              <Dialog.Title>Ajuda rápida</Dialog.Title>
-              <Dialog.Description>
-                Se estiver testando esta demonstração, você pode usar um dos
-                códigos de reserva abaixo.
-              </Dialog.Description>
+              <Dialog.Title>{t("support.title")}</Dialog.Title>
+              <Dialog.Description>{t("support.description")}</Dialog.Description>
             </div>
             <Dialog.Close asChild>
-              <button aria-label="Fechar" className="dialog-close" type="button">
+              <button
+                aria-label={t("support.close")}
+                className="dialog-close"
+                type="button"
+              >
                 <Cross2Icon />
               </button>
             </Dialog.Close>
@@ -52,8 +56,8 @@ export const SupportDialog = ({
           </div>
 
           <ol className="dialog-list">
-            <li>Digite um dos códigos no campo de busca para localizar a reserva.</li>
-            <li>Se ainda não conseguir continuar, procure a recepção para apoio.</li>
+            <li>{t("support.listItem1")}</li>
+            <li>{t("support.listItem2")}</li>
           </ol>
         </Dialog.Content>
       </Dialog.Portal>

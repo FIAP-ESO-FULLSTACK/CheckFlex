@@ -5,3 +5,8 @@ coverage
 .DS_Store
 *.log
 *.tsbuildinfo
+checkflex.db
+checkflex.db-journal
+checkflex.db-wal
+checkflex.db-shm
+logs/

@@ -3,9 +3,13 @@ import { Reservation } from "@/domain/entities/reservation";
 
 /**
  * Dados mínimos para localizar uma reserva no início da jornada.
+ * O segundo fator é o CPF do titular ou, para hóspedes estrangeiros sem CPF,
+ * a data de nascimento registrada no PMS (decisão registrada em AGENTS.md).
  */
 export interface ReservationLookup {
   code: string;
+  document?: string;
+  birthDate?: string;
 }
 
 /**
@@ -19,23 +23,32 @@ export interface AccessRequest {
 }
 
 /**
- * Contrato de acesso aos dados e serviços externos do fluxo de check-in.
- * A aplicação depende desta abstração para buscar reservas, confirmar a
- * hospedagem e emitir as credenciais sem conhecer a implementação concreta.
+ * Resultado do check-out: reserva atualizada, quantidade de credenciais
+ * revogadas e (opcionalmente) a credencial mais recente para que a UI
+ * possa apresentar o PIN/e-mail durante a confirmação visual do check-out.
+ */
+export interface CheckoutResult {
+  reservation: Reservation;
+  revokedAccessCount: number;
+  revokedAccess?: GuestAccess | null;
+}
+
+/**
+ * Contrato consumido pelo fluxo de check-in. Pequeno de propósito: a UI no
+ * navegador implementa apenas o que precisa para falar com a API.
  */
 export interface CheckInRepository {
-  /**
-   * Localiza a reserva correspondente ao código informado.
-   */
   findReservation(input: ReservationLookup): Promise<Reservation | null>;
-
-  /**
-   * Marca a reserva como check-in concluído.
-   */
   confirmCheckIn(reservationId: string): Promise<Reservation>;
-
-  /**
-   * Emite a credencial temporária que será entregue ao hóspede.
-   */
   issueGuestAccess(input: AccessRequest): Promise<GuestAccess>;
+}
+
+/**
+ * Contrato consumido pelo fluxo de check-out. Vive separado para que adapters
+ * que só atuam no servidor implementem revogação sem afetar o adapter HTTP.
+ */
+export interface CheckoutRepository {
+  findReservation(input: ReservationLookup): Promise<Reservation | null>;
+  checkout(reservationId: string): Promise<CheckoutResult>;
+  revokeExpiredAccesses(referenceTime: string): Promise<number>;
 }

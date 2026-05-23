@@ -1,7 +1,10 @@
 import { vi } from "vitest";
 import { GuestAccess } from "@/domain/entities/guest-access";
 import { Reservation } from "@/domain/entities/reservation";
-import { CheckInRepository } from "@/domain/repositories/check-in-repository";
+import {
+  CheckInRepository,
+  CheckoutRepository,
+} from "@/domain/repositories/check-in-repository";
 
 export const makeReservation = (
   overrides: Partial<Reservation> = {},
@@ -36,4 +39,10 @@ export const makeCheckInRepositorySpy = () => ({
   findReservation: vi.fn<CheckInRepository["findReservation"]>(),
   confirmCheckIn: vi.fn<CheckInRepository["confirmCheckIn"]>(),
   issueGuestAccess: vi.fn<CheckInRepository["issueGuestAccess"]>(),
+});
+
+export const makeCheckoutRepositorySpy = () => ({
+  findReservation: vi.fn<CheckoutRepository["findReservation"]>(),
+  checkout: vi.fn<CheckoutRepository["checkout"]>(),
+  revokeExpiredAccesses: vi.fn<CheckoutRepository["revokeExpiredAccesses"]>(),
 });

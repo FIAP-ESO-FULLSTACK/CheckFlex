@@ -7,6 +7,9 @@ export interface GuestAccess {
   // Destino que recebe a chave digital, como telefone ou e-mail.
   digitalKeyTarget: string;
   digitalKeyChannel: "phone" | "email";
+  // E-mail informado no check-in, persistido independentemente do canal
+  // principal da chave (usado para enviar confirmações no check-out).
+  notificationEmail?: string | null;
   roomNumber: string;
   roomLabel: string;
   // Data de expiração em ISO-8601 para revogação alinhada ao checkout.

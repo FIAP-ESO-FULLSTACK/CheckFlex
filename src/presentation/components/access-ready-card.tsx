@@ -3,8 +3,10 @@
 import * as Separator from "@radix-ui/react-separator";
 import { CheckCircledIcon, ReloadIcon } from "@radix-ui/react-icons";
 import { GuestAccess } from "@/domain/entities/guest-access";
+import { useTranslation } from "@/i18n/locale-context";
 import { formatStayWindow, maskPhone } from "@/shared/formatters";
 import { Button } from "@/presentation/components/ui/button";
+import { RfidSimulation } from "@/presentation/components/rfid-simulation";
 
 /**
  * Exibe o resultado final do check-in com PIN, chave digital e validade do acesso.
@@ -22,6 +24,8 @@ export const AccessReadyCard = ({
   access,
   onRestart,
 }: AccessReadyCardProps) => {
+  const { locale, t } = useTranslation();
+
   // Telefones são mascarados para reduzir exposição visual de dados pessoais.
   const digitalTarget =
     access.digitalKeyChannel === "phone"
@@ -32,8 +36,8 @@ export const AccessReadyCard = ({
     <section className="surface surface--feature surface--success">
       <div className="surface__header">
         <div>
-          <span className="eyebrow">Etapa 3</span>
-          <h2>Seu acesso está pronto</h2>
+          <span className="eyebrow">{t("ready.stage")}</span>
+          <h2>{t("ready.title")}</h2>
         </div>
         <div className="icon-badge icon-badge--success">
           <CheckCircledIcon />
@@ -42,11 +46,13 @@ export const AccessReadyCard = ({
 
       <div className="access-hero">
         <div>
-          <span className="access-hero__label">PIN temporário</span>
+          <span className="access-hero__label">{t("ready.pinLabel")}</span>
           <strong className="access-hero__pin">{access.pin}</strong>
         </div>
         <div className="access-hero__meta">
-          <span>Quarto {access.roomNumber}</span>
+          <span>
+            {t("ready.roomLabelTemplate", { number: access.roomNumber })}
+          </span>
           <span>{access.roomLabel}</span>
         </div>
       </div>
@@ -55,23 +61,32 @@ export const AccessReadyCard = ({
 
       <div className="access-grid">
         <div className="reservation-card">
-          <span className="reservation-card__label">Chave digital</span>
+          <span className="reservation-card__label">{t("ready.keyLabel")}</span>
           <strong>{digitalTarget}</strong>
-          <p>Enviada pelo app {access.appProvider}</p>
+          <p>{t("ready.sentByTemplate", { provider: access.appProvider })}</p>
         </div>
         <div className="reservation-card">
-          <span className="reservation-card__label">Validade</span>
-          <strong>Até o checkout</strong>
-          <p>{formatStayWindow(new Date().toISOString(), access.expiresAt)}</p>
+          <span className="reservation-card__label">
+            {t("ready.validityLabel")}
+          </span>
+          <strong>{t("ready.untilCheckout")}</strong>
+          <p>
+            {formatStayWindow(
+              new Date().toISOString(),
+              access.expiresAt,
+              locale,
+              t("ready.stayUntil"),
+            )}
+          </p>
         </div>
       </div>
 
+      <RfidSimulation />
+
       <div className="surface__footer">
-        <p className="soft-note">
-          Guarde este PIN. Ele já pode ser usado para entrar no quarto.
-        </p>
+        <p className="soft-note">{t("ready.keepPinNote")}</p>
         <Button onClick={onRestart} type="button" variant="secondary">
-          Iniciar novo atendimento
+          {t("ready.restart")}
           <ReloadIcon />
         </Button>
       </div>

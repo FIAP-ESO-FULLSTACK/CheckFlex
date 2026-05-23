@@ -281,6 +281,304 @@ input {
   background: rgba(36, 124, 95, 0.12);
 }
 
+.top-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.journey-switch {
+  display: inline-flex;
+  padding: 4px;
+  background: rgba(255, 250, 240, 0.7);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  gap: 4px;
+}
+
+.journey-switch__option {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.journey-switch__option--active {
+  background: var(--surface-strong);
+  color: var(--text);
+  box-shadow: 0 4px 12px rgba(13, 155, 138, 0.12);
+}
+
+.checkout-shell {
+  display: grid;
+  gap: 18px;
+}
+
+.checkout-shell__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.email-toast-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 20, 23, 0.32);
+  backdrop-filter: blur(6px);
+  animation: email-toast-fade 220ms ease-out;
+}
+
+.email-toast {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 30px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-strong);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  max-width: calc(100vw - 48px);
+  animation: email-toast-pop 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.email-toast__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  flex-shrink: 0;
+}
+
+.email-toast__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.email-toast__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.email-toast__text {
+  font-size: 1.05rem;
+}
+
+.email-toast__email {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.checkout-card-label {
+  margin-top: 6px;
+  color: var(--muted);
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: 0.06em;
+}
+
+@keyframes email-toast-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes email-toast-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rfid-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 18px 22px;
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent-soft);
+  color: var(--text);
+  transition:
+    background 240ms ease,
+    border-color 240ms ease;
+}
+
+.rfid-block--loading {
+  border-style: solid;
+}
+
+.rfid-block--ready {
+  border-style: solid;
+  border-color: var(--success);
+  background: var(--success-soft);
+}
+
+.rfid-block__visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-strong);
+  flex-shrink: 0;
+}
+
+.rfid-block__icon {
+  width: 24px;
+  height: 24px;
+}
+
+.rfid-block--tap .rfid-block__icon {
+  animation: rfid-pulse 1.2s ease-in-out infinite;
+  color: var(--accent-strong);
+}
+
+.rfid-block__icon--ready {
+  color: var(--success);
+}
+
+@keyframes rfid-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.7;
+  }
+}
+
+.rfid-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(13, 155, 138, 0.25);
+  border-top-color: var(--accent-strong);
+  border-radius: 50%;
+  animation: rfid-spin 0.8s linear infinite;
+}
+
+@keyframes rfid-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rfid-block__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rfid-block__text strong {
+  font-size: 1rem;
+}
+
+.rfid-block__text span {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.metrics-grid__card {
+  display: grid;
+  gap: 4px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-strong);
+}
+
+.metrics-grid__label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.metrics-grid__value {
+  font-size: 2rem;
+}
+
+.factor-group {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.factor-group__legend {
+  padding: 0;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.factor-group__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.factor-option {
+  display: grid;
+  gap: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: #fffefb;
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.factor-option input {
+  display: none;
+}
+
+.factor-option__label {
+  font-weight: 700;
+}
+
+.factor-option__hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.factor-option--active {
+  border-color: rgba(13, 155, 138, 0.54);
+  box-shadow: 0 0 0 4px rgba(13, 155, 138, 0.12);
+}
+
 .field {
   display: grid;
   gap: 10px;
@@ -575,5 +873,64 @@ input {
 
   .access-hero__pin {
     letter-spacing: 0.08em;
+  }
+}
+
+/* Otimizações para totem em retrato (resoluções típicas 1080x1920 e 1280x1920). */
+@media (orientation: portrait) and (min-width: 720px) {
+  body {
+    font-size: 1.05rem;
+  }
+
+  .kiosk-shell {
+    padding: 56px 48px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .top-bar__title {
+    font-size: clamp(2.2rem, 4vw, 3rem);
+  }
+
+  .surface {
+    padding: 36px;
+  }
+
+  .field__control,
+  .button {
+    min-height: 64px;
+    font-size: 1.1rem;
+  }
+
+  .factor-option {
+    min-height: 80px;
+    align-content: center;
+  }
+
+  .access-hero__pin {
+    font-size: clamp(3.4rem, 8vw, 5.2rem);
+  }
+}
+
+/* Modo totem em landscape 1920x1080. */
+@media (orientation: landscape) and (min-width: 1600px) {
+  .kiosk-shell {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 64px 80px;
+  }
+
+  .field__control,
+  .button {
+    min-height: 60px;
+  }
+}
+
+/* Em qualquer tela touch desabilita seleção acidental e zoom por gesto. */
+@media (hover: none) and (pointer: coarse) {
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
   }
 }

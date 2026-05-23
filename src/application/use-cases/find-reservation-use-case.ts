@@ -15,8 +15,10 @@ export class FindReservationUseCase {
     const reservation = await this.repository.findReservation(input);
 
     if (!reservation) {
+      // Mensagem genérica para não revelar se foi o código ou o segundo fator
+      // que divergiu, conforme decisão registrada em AGENTS.md (US 5).
       throw new Error(
-        "Não encontramos uma reserva com esse código. Revise os dados e tente novamente.",
+        "Reserva não encontrada ou dados não conferem. Revise os dados e tente novamente.",
       );
     }
 
